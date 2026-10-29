@@ -1,0 +1,472 @@
+{
+  "id": "salondesk",
+  "name": "SalonDesk",
+  "tagline": "A calmer day behind the chair.",
+  "category": "Salon",
+  "color": "#9D174D",
+  "description": "Offline appointments, service bills, staff commissions and client histories for salons and barbers.",
+  "entities": [
+    {
+      "key": "clients",
+      "label": "Clients",
+      "singular": "Client",
+      "description": "Contacts and notes for repeat business.",
+      "primary": "name",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Full name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "address",
+          "label": "Address",
+          "type": "textarea"
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "type": "textarea"
+        }
+      ],
+      "columns": [
+        "name",
+        "phone",
+        "address"
+      ]
+    },
+    {
+      "key": "staff",
+      "label": "Staff",
+      "singular": "Staff member",
+      "description": "Maintain the team and booking resources.",
+      "primary": "name",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Staff name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "phone",
+          "label": "Phone",
+          "type": "text"
+        },
+        {
+          "key": "speciality",
+          "label": "Speciality",
+          "type": "text"
+        },
+        {
+          "key": "commissionRate",
+          "label": "Usual commission percent",
+          "type": "number",
+          "min": 0,
+          "default": 0,
+          "max": 100
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "type": "textarea"
+        }
+      ],
+      "columns": [
+        "name",
+        "phone",
+        "speciality",
+        "commissionRate"
+      ]
+    },
+    {
+      "key": "services",
+      "label": "Services",
+      "singular": "Service",
+      "description": "Standard prices and estimated service durations.",
+      "primary": "name",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Service name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "price",
+          "label": "Standard price",
+          "type": "money",
+          "required": true,
+          "min": 0,
+          "default": 0
+        },
+        {
+          "key": "duration",
+          "label": "Typical duration (minutes)",
+          "type": "number",
+          "required": true,
+          "min": 1,
+          "default": 30,
+          "integer": true
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "type": "textarea"
+        }
+      ],
+      "columns": [
+        "name",
+        "category",
+        "price",
+        "duration"
+      ]
+    },
+    {
+      "key": "appointments",
+      "label": "Appointments",
+      "singular": "Appointment",
+      "description": "Book a staff member; overlapping appointments are prevented.",
+      "primary": "title",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Appointment title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "client",
+          "label": "Client",
+          "type": "reference",
+          "required": true,
+          "reference": "clients"
+        },
+        {
+          "key": "staff",
+          "label": "Staff member",
+          "type": "reference",
+          "required": true,
+          "reference": "staff"
+        },
+        {
+          "key": "service",
+          "label": "Main service",
+          "type": "reference",
+          "required": true,
+          "reference": "services"
+        },
+        {
+          "key": "start",
+          "label": "Start time",
+          "type": "datetime-local",
+          "required": true
+        },
+        {
+          "key": "end",
+          "label": "End time",
+          "type": "datetime-local",
+          "required": true
+        },
+        {
+          "key": "notes",
+          "label": "Preferences / notes",
+          "type": "textarea"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Booked",
+            "Confirmed",
+            "In service",
+            "Completed",
+            "Cancelled"
+          ],
+          "default": "Booked"
+        }
+      ],
+      "columns": [
+        "title",
+        "client",
+        "staff",
+        "start",
+        "end",
+        "status"
+      ],
+      "workflow": {
+        "field": "status",
+        "initial": "Booked",
+        "states": [
+          "Booked",
+          "Confirmed",
+          "In service",
+          "Completed",
+          "Cancelled"
+        ],
+        "terminal": [
+          "Completed",
+          "Cancelled"
+        ]
+      },
+      "booking": {
+        "resource": "staff",
+        "start": "start",
+        "end": "end",
+        "inactive": [
+          "Completed",
+          "Cancelled"
+        ]
+      },
+      "dateOrder": [
+        [
+          "start",
+          "end"
+        ]
+      ]
+    },
+    {
+      "key": "visits",
+      "label": "Service bills",
+      "singular": "Service bill",
+      "description": "Bill walk-ins or appointments and estimate staff commission.",
+      "primary": "title",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Bill title",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "client",
+          "label": "Client",
+          "type": "reference",
+          "required": true,
+          "reference": "clients"
+        },
+        {
+          "key": "staff",
+          "label": "Staff member",
+          "type": "reference",
+          "required": true,
+          "reference": "staff"
+        },
+        {
+          "key": "appointment",
+          "label": "Appointment (optional)",
+          "type": "reference",
+          "reference": "appointments"
+        },
+        {
+          "key": "date",
+          "label": "Visit date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "services",
+          "label": "Services provided",
+          "type": "lines",
+          "required": true,
+          "reference": "services",
+          "priceField": "price",
+          "integer": true
+        },
+        {
+          "key": "amount",
+          "label": "Bill total",
+          "type": "money",
+          "required": true,
+          "min": 0,
+          "default": 0
+        },
+        {
+          "key": "paid",
+          "label": "Amount collected",
+          "type": "money",
+          "required": true,
+          "min": 0,
+          "default": 0
+        },
+        {
+          "key": "paymentMethod",
+          "label": "Initial payment method",
+          "type": "select",
+          "required": true,
+          "options": [
+            "cash",
+            "card",
+            "bank"
+          ],
+          "default": "cash",
+          "hint": "Applies to the amount entered when creating this record. Later payments choose their own method."
+        },
+        {
+          "key": "commissionRate",
+          "label": "Commission percent for this bill",
+          "type": "number",
+          "required": true,
+          "min": 0,
+          "default": 0,
+          "hint": "Enter the agreed percent; the staff default is informational.",
+          "max": 100
+        },
+        {
+          "key": "commission",
+          "label": "Commission estimate",
+          "type": "money",
+          "min": 0,
+          "default": 0
+        },
+        {
+          "key": "notes",
+          "label": "Visit notes",
+          "type": "textarea"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Open",
+            "Completed",
+            "Cancelled"
+          ],
+          "default": "Open"
+        }
+      ],
+      "columns": [
+        "title",
+        "client",
+        "staff",
+        "date",
+        "amount",
+        "status"
+      ],
+      "workflow": {
+        "field": "status",
+        "initial": "Open",
+        "states": [
+          "Open",
+          "Completed",
+          "Cancelled"
+        ],
+        "terminal": [
+          "Completed",
+          "Cancelled"
+        ]
+      },
+      "finance": {
+        "total": "amount",
+        "paid": "paid"
+      },
+      "calculations": [
+        {
+          "target": "amount",
+          "op": "sumLines",
+          "fields": [
+            "services"
+          ]
+        },
+        {
+          "target": "commission",
+          "op": "percent",
+          "fields": [
+            "amount",
+            "commissionRate"
+          ]
+        }
+      ]
+    },
+    {
+      "key": "expenses",
+      "label": "Expenses",
+      "singular": "Expense",
+      "description": "Record operating costs separately from customer bills.",
+      "primary": "title",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Expense description",
+          "type": "text",
+          "required": true
+        },
+        {
+          "key": "date",
+          "label": "Expense date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "key": "category",
+          "label": "Category",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Supplies",
+            "Utilities",
+            "Rent",
+            "Wages",
+            "Other"
+          ]
+        },
+        {
+          "key": "amount",
+          "label": "Amount",
+          "type": "money",
+          "required": true,
+          "min": 0,
+          "default": 0
+        },
+        {
+          "key": "method",
+          "label": "Payment method",
+          "type": "select",
+          "required": true,
+          "options": [
+            "Cash",
+            "Card",
+            "Bank"
+          ],
+          "default": "Cash"
+        },
+        {
+          "key": "note",
+          "label": "Notes",
+          "type": "textarea"
+        }
+      ],
+      "columns": [
+        "title",
+        "date",
+        "category",
+        "amount",
+        "method"
+      ]
+    }
+  ],
+  "limitations": [
+    "Conflicts are checked per staff member, not room, chair or equipment. Opening hours and leave are not enforced.",
+    "Completing an appointment does not create a bill automatically; explicitly create and link its service bill.",
+    "Commission is an estimate on the full bill using the entered percent, not payroll or a cash-collection allocation.",
+    "No automatic reminders, memberships, package balances, inventory usage, refunds or tax accounting.",
+    "One owner account and one computer; no multi-user networking."
+  ]
+}
